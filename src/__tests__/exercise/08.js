@@ -2,35 +2,25 @@
 // http://localhost:3000/counter-hook
 
 import * as React from 'react'
-import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import { act, render, screen } from '@testing-library/react'
 import useCounter from '../../components/use-counter'
 
-const TestComp = () => {
-  const { count, increment, decrement } = useCounter()
-  return (
-    <div>
-      <span>{`Count is: ${count}`}</span>
-      <button onClick={increment}>increment</button>
-      <button onClick={decrement}>decrement</button>
-    </div>)
-}
-
 test('exposes the count and increment/decrement functions', () => {
-  // 🐨 render the component
-  render(<TestComp />)
-  // 🐨 get the elements you need using screen
-  const countContainer = screen.getByText(/count is/i)
-  const incrementBtn = screen.getByText('increment')
-  const decrementBtn = screen.getByText('decrement')
+  let result
 
-  expect(countContainer).toHaveTextContent('Count is: 0')
+  function TestComponent() {
+    result = useCounter()
+    return null
+  }
 
-  userEvent.click(incrementBtn)
-  expect(countContainer).toHaveTextContent('Count is: 1')
+  render(<TestComponent />)
+  expect(result.count).toBe(0)
 
-  userEvent.click(decrementBtn)
-  expect(countContainer).toHaveTextContent('Count is: 0')
+  act(() => result.increment())
+  expect(result.count).toBe(1)
+
+  act(() => result.decrement())
+  expect(result.count).toBe(0)
 })
 
 /* eslint no-unused-vars:0 */
